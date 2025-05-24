@@ -1,26 +1,23 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import type { IMessage } from "./interfaces";
+import type { IMessage } from "../interfaces";
 
 const initialData: IMessage[] = [
   {
-    role: 'system',
-    content: "You are an AI assistan, but you give only short answers",
+    role: "assistant",
+    content: "Founder training engine at your service",
   },
   {
     role: "user",
-    content: "What's the gravity on the moon?",
-  },
-  {
-    role: "assistant",
-    content: "1/6 the gravity of Earth",
+    content: "Founder training engine at your service",
   },
 ];
 
-function App() {
+function Chat() {
   const [messages, setMessages] = useState<IMessage[]>(initialData);
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [model,/* setModel */]=useState<string>('openai')
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -48,9 +45,10 @@ function App() {
       setMessages((prev) => [...prev, userMessage]);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000); 
 
-      const response = await fetch("/api/chat", {
+      const url=`/api/chat/${model}`
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +57,6 @@ function App() {
           messages: [...messages, userMessage],
         }),
         signal: controller.signal,
-        
 
       });
       clearTimeout(timeoutId);
@@ -69,7 +66,11 @@ function App() {
       }
 
       const data = await response.json();
-      console.log("data ",data)
+      if(!data.ok){
+        setError(data.message)
+        return
+      }
+
       const assistantMessage: IMessage = {
         role: "assistant",
         content: data.content,
@@ -84,7 +85,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [inputValue, messages]);
+  }, [inputValue, messages, model]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -94,18 +95,26 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-100">
-      <div className="w-full max-w-2xl p-6 rounded-md bg-white shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-center">Chat</h2>
+    <div className="flex flex-col items-center justify-center min-h-screen w-full bg-black">
+      {/* <select
+      className="m-4"
+      onChange={(e:React.ChangeEvent<HTMLSelectElement>)=>setModel(e.target.value)}
+      >
+        <option value="llama3">Llama 3</option>
+        <option value="openai">Chatgpt 4.1</option>
+      </select> */}
+
+      <div className="w-full text-white max-w-2xl p-6 rounded-md bg-black shadow-lg border-1 border-b-blue-50">
+        <h2 className="text-2xl  bg-black font-bold mb-4 text-center">Founder Training Engine</h2>
         
-        <div className="h-96 overflow-y-auto mb-4 space-y-4">
+        <div className="h-96 overflow-y-auto mb-4 space-y-4 bg-black">
           {messages.map((message, index) => (
             <div
               key={index}
               className={`p-3 rounded-lg ${
                 message.role === "user"
-                  ? "bg-blue-100 ml-auto max-w-xs"
-                  : "bg-gray-100 mr-auto max-w-xs"
+                  ? "bg-gray-800 ml-auto max-w-xs"
+                  : "bg-black mr-auto max-w-xs"
               }`}
             >
               <p className="font-semibold capitalize">{message.role}</p>
@@ -117,12 +126,12 @@ function App() {
               <p>Thinking...</p>
             </div>
           )}
+
+          {error && (
+            <div className="text-red-500 mb-4 text-center">{error}</div>
+          )}
           <div ref={messagesEndRef} />
         </div>
-
-        {error && (
-          <div className="text-red-500 mb-4 text-center">{error}</div>
-        )}
 
         <div className="flex gap-2">
           <input
@@ -135,7 +144,7 @@ function App() {
             disabled={isLoading}
           />
           <button
-            className="rounded-md px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
+            className="rounded-md px-4 py-2 bg-blue-400 text-white hover:bg-blue-600 disabled:bg-gray-500 transition-colors"
             disabled={!inputValue.trim() || isLoading}
             onClick={handleSend}
           >
@@ -147,4 +156,4 @@ function App() {
   );
 }
 
-export default App;
+export default Chat;
