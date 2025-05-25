@@ -106,7 +106,7 @@ function Chat() {
             Founder Training Engine
           </h2>
           <button className="m-4 rounded-md px-4 py-2 text-white hover:bg-blue-600 bg-gray-500 transition-colors">
-            <a href="/login/logout">Log out</a>
+            <a href="/api/login/logout">Log out</a>
           </button>
         </div>
         <div className="h-96 overflow-y-auto mb-4 space-y-4 bg-black">
@@ -124,7 +124,7 @@ function Chat() {
             </div>
           ))}
           {isLoading && (
-            <div className="bg-gray-100 p-3 rounded-lg mr-auto max-w-xs">
+            <div className="bg-black mr-auto max-w-xs">
               <p>Thinking...</p>
             </div>
           )}
