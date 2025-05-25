@@ -17,6 +17,8 @@ function Chat() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -27,6 +29,14 @@ function Chat() {
 
   const handleSend = useCallback(async () => {
     if (!inputValue.trim()) return;
+
+    // Abort previous request if still loading
+    if (isLoading && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false); // Reset loading state
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -40,9 +50,11 @@ function Chat() {
       
       setMessages((prev) => [...prev, userMessage]);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); 
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      const timeoutId = setTimeout(() => controller.abort(), 20000); 
 
+      // const url = `/api/abort`;
       const url=`/api/chat/${model}`
       const response = await fetch(url, {
         method: "POST",
@@ -56,6 +68,7 @@ function Chat() {
 
       });
       clearTimeout(timeoutId);
+      abortControllerRef.current = null; // Clear after successful request
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -81,7 +94,7 @@ function Chat() {
     } finally {
       setIsLoading(false);
     }
-  }, [inputValue, messages, model]);
+  }, [inputValue, messages, model,isLoading]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -147,10 +160,10 @@ function Chat() {
           />
           <button
             className="rounded-md px-4 py-2 bg-blue-400 text-white hover:bg-blue-600 disabled:bg-gray-500 transition-colors"
-            disabled={!inputValue.trim() || isLoading}
+            disabled={!inputValue.trim() }
             onClick={handleSend}
           >
-            {isLoading ? 'Sending...' : 'Send'}
+            {isLoading ? 'Abort?...' : 'Send'}
           </button>
         </div>
       </div>
