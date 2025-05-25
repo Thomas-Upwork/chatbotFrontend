@@ -17,13 +17,19 @@ export const Login = () => {
 
     try {
       const url = '/api/login'
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); 
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({password}),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
       const data = await response.json();
       setMessage(data.message);
       if(data.ok==true){
