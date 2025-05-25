@@ -5,11 +5,7 @@ const initialData: IMessage[] = [
   {
     role: "assistant",
     content: "Founder training engine at your service",
-  },
-  {
-    role: "user",
-    content: "Founder training engine at your service",
-  },
+  }
 ];
 
 function Chat() {
@@ -100,21 +96,27 @@ function Chat() {
       className="m-4"
       onChange={(e:React.ChangeEvent<HTMLSelectElement>)=>setModel(e.target.value)}
       >
-        <option value="llama3">Llama 3</option>
-        <option value="openai">Chatgpt 4.1</option>
+      <option value="llama3">Llama 3</option>
+      <option value="openai">Chatgpt 4.1</option>
       </select> */}
 
-      <div className="w-full text-white max-w-2xl p-6 rounded-md bg-black shadow-lg border-1 border-b-blue-50">
-        <h2 className="text-2xl  bg-black font-bold mb-4 text-center">Founder Training Engine</h2>
-        
+      <div className="w-full maindiv text-white max-w-2xl p-6 rounded-md bg-black shadow-lg border-1 border-b-blue-50">
+        <div className="flex flex-row justify-between items-center">
+          <h2 className="text-2xl  bg-black font-bold mb-4 text-center">
+            Founder Training Engine
+          </h2>
+          <button className="m-4 rounded-md px-4 py-2 text-white hover:bg-blue-600 bg-gray-500 transition-colors">
+            <a href="/login/logout">Log out</a>
+          </button>
+        </div>
         <div className="h-96 overflow-y-auto mb-4 space-y-4 bg-black">
           {messages.map((message, index) => (
             <div
               key={index}
               className={`p-3 rounded-lg ${
-                message.role === "user"
-                  ? "bg-gray-800 ml-auto max-w-xs"
-                  : "bg-black mr-auto max-w-xs"
+                message.role === 'user'
+                  ? 'bg-gray-800 ml-auto max-w-xs'
+                  : 'bg-black mr-auto max-w-xs'
               }`}
             >
               <p className="font-semibold capitalize">{message.role}</p>
@@ -148,7 +150,7 @@ function Chat() {
             disabled={!inputValue.trim() || isLoading}
             onClick={handleSend}
           >
-            {isLoading ? "Sending..." : "Send"}
+            {isLoading ? 'Sending...' : 'Send'}
           </button>
         </div>
       </div>

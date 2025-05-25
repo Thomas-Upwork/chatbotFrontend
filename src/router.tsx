@@ -8,12 +8,11 @@ export const router = createBrowserRouter([{
   errorElement: <Login />,
   children: [{
       index:true, //Esta es la ruta raiz"/"
-      element: <Login/>,
-    },
-    {
-      path: "/chat",
       element: <Chat/>,
     },
-   
+    {
+      path: "/login",
+      element: <Login />,
+    },
   ]}
 ])
